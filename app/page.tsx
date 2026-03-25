@@ -100,22 +100,16 @@ export default function IdolPaymentCalculator() {
       
       companyTotal += companyEarnings
       
-      // Calculate total count (excluding group photo as it's shared)
-      const totalCount = input.regular + input.keepPhoto + input.newFan + input.birthday + input.solo
+      // Build type list with counts: "19 普通 + 4新規 + 1全員"
+      const parts: string[] = []
+      if (input.regular > 0) parts.push(`${input.regular} 普通`)
+      if (input.keepPhoto > 0) parts.push(`${input.keepPhoto}留相`)
+      if (input.newFan > 0) parts.push(`${input.newFan}新規`)
+      if (groupPhotoCount > 0) parts.push(`${groupPhotoCount}全員`)
+      if (input.birthday > 0) parts.push(`${input.birthday}生誕祭`)
+      if (input.solo > 0) parts.push(`${input.solo}Solo`)
       
-      // Build type list without counts
-      const types: string[] = []
-      if (input.regular > 0) types.push("普通")
-      if (input.keepPhoto > 0) types.push("留相")
-      if (input.newFan > 0) types.push("新規")
-      if (groupPhotoCount > 0) types.push("全員")
-      if (input.birthday > 0) types.push("生誕祭")
-      if (input.solo > 0) types.push("Solo")
-      
-      // Format: "19 普通 + 全員" or just types joined
-      const breakdown = totalCount > 0 
-        ? `${totalCount} ${types.join(" + ")}`
-        : types.length > 0 ? types.join(" + ") : "無"
+      const breakdown = parts.length > 0 ? parts.join(" + ") : "無"
       
       return {
         name: member.name,
