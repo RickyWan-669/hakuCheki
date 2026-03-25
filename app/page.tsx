@@ -15,6 +15,7 @@ interface Member {
 
 interface MemberInput {
   regular: number
+  keepPhoto: number
   newFan: number
   groupPhoto: number
   birthday: number
@@ -45,7 +46,7 @@ export default function IdolPaymentCalculator() {
     Object.fromEntries(
       MEMBERS.map((m) => [
         m.name,
-        { regular: 0, newFan: 0, groupPhoto: 0, birthday: 0, solo: 0 },
+        { regular: 0, keepPhoto: 0, newFan: 0, groupPhoto: 0, birthday: 0, solo: 0 },
       ])
     )
   )
@@ -75,6 +76,9 @@ export default function IdolPaymentCalculator() {
       const regularMember = input.regular * 30
       const regularCompany = input.regular * 30
       
+      const keepPhotoMember = input.keepPhoto * 30
+      const keepPhotoCompany = input.keepPhoto * 30
+      
       const newFanMember = input.newFan * 5
       const newFanCompany = 0
       
@@ -87,13 +91,14 @@ export default function IdolPaymentCalculator() {
       const soloMember = input.solo * CHEKI_PRICE * 0.7
       const soloCompany = input.solo * CHEKI_PRICE * 0.3
       
-      const memberEarnings = regularMember + newFanMember + groupPhotoMember + birthdayMember + soloMember
-      const companyEarnings = regularCompany + newFanCompany + groupPhotoCompany + birthdayCompany + soloCompany
+      const memberEarnings = regularMember + keepPhotoMember + newFanMember + groupPhotoMember + birthdayMember + soloMember
+      const companyEarnings = regularCompany + keepPhotoCompany + newFanCompany + groupPhotoCompany + birthdayCompany + soloCompany
       
       companyTotal += companyEarnings
       
       const parts: string[] = []
       if (input.regular > 0) parts.push(`${input.regular} 普通`)
+      if (input.keepPhoto > 0) parts.push(`${input.keepPhoto} 留相`)
       if (input.newFan > 0) parts.push(`${input.newFan} 新規`)
       if (input.groupPhoto > 0) parts.push(`${input.groupPhoto} 全員`)
       if (input.birthday > 0) parts.push(`${input.birthday} 生誕祭`)
@@ -132,7 +137,7 @@ export default function IdolPaymentCalculator() {
       Object.fromEntries(
         MEMBERS.map((m) => [
           m.name,
-          { regular: 0, newFan: 0, groupPhoto: 0, birthday: 0, solo: 0 },
+          { regular: 0, keepPhoto: 0, newFan: 0, groupPhoto: 0, birthday: 0, solo: 0 },
         ])
       )
     )
@@ -156,9 +161,14 @@ export default function IdolPaymentCalculator() {
             查看收費及分成比例
           </summary>
           <div className="mt-2 bg-white rounded-lg p-3 shadow-sm">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs sm:text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs sm:text-sm">
               <div className="p-2 bg-gray-50 rounded-lg">
                 <p className="font-medium">普通</p>
+                <p className="text-muted-foreground">$60 (50/50)</p>
+                <p className="text-green-600">成員: $30</p>
+              </div>
+              <div className="p-2 bg-gray-50 rounded-lg">
+                <p className="font-medium">留相</p>
                 <p className="text-muted-foreground">$60 (50/50)</p>
                 <p className="text-green-600">成員: $30</p>
               </div>
@@ -212,7 +222,7 @@ export default function IdolPaymentCalculator() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3">
-                <div className="grid grid-cols-5 gap-1.5">
+                <div className="grid grid-cols-6 gap-1.5">
                   <div>
                     <Label className="text-[10px] block text-center mb-1">普通</Label>
                     <Input
@@ -222,6 +232,20 @@ export default function IdolPaymentCalculator() {
                       value={inputs[member.name]?.regular || ""}
                       onChange={(e) =>
                         updateInput(member.name, "regular", e.target.value)
+                      }
+                      placeholder="0"
+                      className="text-center text-sm h-9 px-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-[10px] block text-center mb-1">留相</Label>
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      min="0"
+                      value={inputs[member.name]?.keepPhoto || ""}
+                      onChange={(e) =>
+                        updateInput(member.name, "keepPhoto", e.target.value)
                       }
                       placeholder="0"
                       className="text-center text-sm h-9 px-1"
