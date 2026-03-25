@@ -100,19 +100,28 @@ export default function IdolPaymentCalculator() {
       
       companyTotal += companyEarnings
       
-      const parts: string[] = []
-      if (input.regular > 0) parts.push(`${input.regular} 普通`)
-      if (input.keepPhoto > 0) parts.push(`${input.keepPhoto} 留相`)
-      if (input.newFan > 0) parts.push(`${input.newFan} 新規`)
-      if (groupPhotoCount > 0) parts.push(`${groupPhotoCount} 全員`)
-      if (input.birthday > 0) parts.push(`${input.birthday} 生誕祭`)
-      if (input.solo > 0) parts.push(`${input.solo} Solo`)
+      // Calculate total count (excluding group photo as it's shared)
+      const totalCount = input.regular + input.keepPhoto + input.newFan + input.birthday + input.solo
+      
+      // Build type list without counts
+      const types: string[] = []
+      if (input.regular > 0) types.push("普通")
+      if (input.keepPhoto > 0) types.push("留相")
+      if (input.newFan > 0) types.push("新規")
+      if (groupPhotoCount > 0) types.push("全員")
+      if (input.birthday > 0) types.push("生誕祭")
+      if (input.solo > 0) types.push("Solo")
+      
+      // Format: "19 普通 + 全員" or just types joined
+      const breakdown = totalCount > 0 
+        ? `${totalCount} ${types.join(" + ")}`
+        : types.length > 0 ? types.join(" + ") : "無"
       
       return {
         name: member.name,
         memberEarnings,
         companyEarnings,
-        breakdown: parts.join(" + ") || "無",
+        breakdown,
       }
     })
     
@@ -123,11 +132,12 @@ export default function IdolPaymentCalculator() {
   const copyResults = () => {
     if (!results) return
     
-    let text = eventDate ? `${eventDate}\n\n` : ""
+    let text = ""
     
     results.forEach((r) => {
       if (r.memberEarnings > 0) {
-        text += `${r.name}\n${r.breakdown} $${r.memberEarnings}\n\n`
+        const dateLine = eventDate ? `${eventDate} ` : ""
+        text += `${dateLine}${r.name}\n${r.breakdown} $${r.memberEarnings}\n`
       }
     })
     
@@ -396,11 +406,10 @@ export default function IdolPaymentCalculator() {
             </CardHeader>
             <CardContent className="px-4 pb-4">
               <pre className="bg-gray-50 p-3 rounded-lg text-xs sm:text-sm whitespace-pre-wrap font-mono overflow-x-auto">
-                {eventDate && `${eventDate}\n\n`}
                 {results
                   .filter((r) => r.memberEarnings > 0)
                   .map(
-                    (r) => `${r.name}\n${r.breakdown} $${r.memberEarnings}\n`
+                    (r) => `${eventDate ? `${eventDate} ` : ""}${r.name}\n${r.breakdown} $${r.memberEarnings}`
                   )
                   .join("\n")}
                 {`\n公司總收入: $${totalCompanyEarnings}`}
