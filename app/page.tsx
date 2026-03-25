@@ -148,7 +148,6 @@ export default function IdolPaymentCalculator() {
           Hakuchuumu出糧計算器
         </h1>
         <p className="text-center text-sm text-muted-foreground mb-4 sm:mb-6">
-          計算每位成員應得的收入和公司收益
         </p>
 
         {/* Price Info - Collapsible on mobile */}
