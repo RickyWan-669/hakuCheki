@@ -17,7 +17,6 @@ interface MemberInput {
   regular: number
   keepPhoto: number
   newFan: number
-  groupPhoto: number
   birthday: number
   solo: number
 }
@@ -46,10 +45,11 @@ export default function IdolPaymentCalculator() {
     Object.fromEntries(
       MEMBERS.map((m) => [
         m.name,
-        { regular: 0, keepPhoto: 0, newFan: 0, groupPhoto: 0, birthday: 0, solo: 0 },
+        { regular: 0, keepPhoto: 0, newFan: 0, birthday: 0, solo: 0 },
       ])
     )
   )
+  const [groupPhotoCount, setGroupPhotoCount] = useState(0)
   const [results, setResults] = useState<MemberResult[] | null>(null)
   const [totalCompanyEarnings, setTotalCompanyEarnings] = useState(0)
 
@@ -70,6 +70,13 @@ export default function IdolPaymentCalculator() {
 
   const calculate = () => {
     let companyTotal = 0
+    
+    // 全員合照的收入計算 (每位成員獲得 $25)
+    const groupPhotoMemberEach = groupPhotoCount * 25
+    // 公司從全員合照獲得的總收入 = 張數 * ($60 - $25 * 成員數)
+    const groupPhotoCompanyTotal = groupPhotoCount * (CHEKI_PRICE - 25 * MEMBERS.length)
+    companyTotal += groupPhotoCompanyTotal > 0 ? groupPhotoCompanyTotal : 0
+    
     const memberResults: MemberResult[] = MEMBERS.map((member) => {
       const input = inputs[member.name]
       
@@ -82,33 +89,33 @@ export default function IdolPaymentCalculator() {
       const newFanMember = input.newFan * 5
       const newFanCompany = 0
       
-      const groupPhotoMember = input.groupPhoto * 25
-      const groupPhotoCompany = input.groupPhoto * (CHEKI_PRICE - 25)
-      
       const birthdayMember = input.birthday * CHEKI_PRICE * 0.6
       const birthdayCompany = input.birthday * CHEKI_PRICE * 0.4
       
       const soloMember = input.solo * CHEKI_PRICE * 0.7
       const soloCompany = input.solo * CHEKI_PRICE * 0.3
       
-      const memberEarnings = regularMember + keepPhotoMember + newFanMember + groupPhotoMember + birthdayMember + soloMember
-      const companyEarnings = regularCompany + keepPhotoCompany + newFanCompany + groupPhotoCompany + birthdayCompany + soloCompany
+      const memberEarnings = regularMember + keepPhotoMember + newFanMember + groupPhotoMemberEach + birthdayMember + soloMember
+      const companyEarnings = regularCompany + keepPhotoCompany + newFanCompany + birthdayCompany + soloCompany
       
       companyTotal += companyEarnings
       
+      // Build type list with counts: "19 普通 + 4新規 + 1全員"
       const parts: string[] = []
       if (input.regular > 0) parts.push(`${input.regular} 普通`)
-      if (input.keepPhoto > 0) parts.push(`${input.keepPhoto} 留相`)
-      if (input.newFan > 0) parts.push(`${input.newFan} 新規`)
-      if (input.groupPhoto > 0) parts.push(`${input.groupPhoto} 全員`)
-      if (input.birthday > 0) parts.push(`${input.birthday} 生誕祭`)
-      if (input.solo > 0) parts.push(`${input.solo} Solo`)
+      if (input.keepPhoto > 0) parts.push(`${input.keepPhoto}留相`)
+      if (input.newFan > 0) parts.push(`${input.newFan}新規`)
+      if (groupPhotoCount > 0) parts.push(`${groupPhotoCount}全員`)
+      if (input.birthday > 0) parts.push(`${input.birthday}生誕祭`)
+      if (input.solo > 0) parts.push(`${input.solo}Solo`)
+      
+      const breakdown = parts.length > 0 ? parts.join(" + ") : "無"
       
       return {
         name: member.name,
         memberEarnings,
         companyEarnings,
-        breakdown: parts.join(" + ") || "無",
+        breakdown,
       }
     })
     
@@ -119,11 +126,12 @@ export default function IdolPaymentCalculator() {
   const copyResults = () => {
     if (!results) return
     
-    let text = eventDate ? `${eventDate}\n\n` : ""
+    let text = ""
     
     results.forEach((r) => {
       if (r.memberEarnings > 0) {
-        text += `${r.name}\n${r.breakdown} $${r.memberEarnings}\n\n`
+        const dateLine = eventDate ? `${eventDate} ` : ""
+        text += `${dateLine}${r.name}\n${r.breakdown} $${r.memberEarnings}\n`
       }
     })
     
@@ -137,10 +145,11 @@ export default function IdolPaymentCalculator() {
       Object.fromEntries(
         MEMBERS.map((m) => [
           m.name,
-          { regular: 0, keepPhoto: 0, newFan: 0, groupPhoto: 0, birthday: 0, solo: 0 },
+          { regular: 0, keepPhoto: 0, newFan: 0, birthday: 0, solo: 0 },
         ])
       )
     )
+    setGroupPhotoCount(0)
     setResults(null)
     setTotalCompanyEarnings(0)
     setEventDate("")
@@ -222,7 +231,7 @@ export default function IdolPaymentCalculator() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3">
-                <div className="grid grid-cols-4 gap-1.5">
+                <div className="grid grid-cols-3 gap-1.5">
                   <div>
                     <Label className="text-[10px] block text-center mb-1">普通</Label>
                     <Input
@@ -260,20 +269,6 @@ export default function IdolPaymentCalculator() {
                       value={inputs[member.name]?.newFan || ""}
                       onChange={(e) =>
                         updateInput(member.name, "newFan", e.target.value)
-                      }
-                      placeholder="0"
-                      className="text-center text-sm h-9 px-1"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-[10px] block text-center mb-1">全員</Label>
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      min="0"
-                      value={inputs[member.name]?.groupPhoto || ""}
-                      onChange={(e) =>
-                        updateInput(member.name, "groupPhoto", e.target.value)
                       }
                       placeholder="0"
                       className="text-center text-sm h-9 px-1"
@@ -319,6 +314,29 @@ export default function IdolPaymentCalculator() {
             </Card>
           ))}
         </div>
+
+        {/* Group Photo Input */}
+        <Card className="mb-4 border-2 border-emerald-400">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <Label className="text-sm font-medium">全員合照</Label>
+                <p className="text-xs text-muted-foreground"></p>
+              </div>
+              <div className="w-24">
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  value={groupPhotoCount || ""}
+                  onChange={(e) => setGroupPhotoCount(parseInt(e.target.value) || 0)}
+                  placeholder="0"
+                  className="text-center text-lg h-12"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Action Buttons */}
         <div className="flex justify-center gap-3 mb-4">
@@ -382,11 +400,10 @@ export default function IdolPaymentCalculator() {
             </CardHeader>
             <CardContent className="px-4 pb-4">
               <pre className="bg-gray-50 p-3 rounded-lg text-xs sm:text-sm whitespace-pre-wrap font-mono overflow-x-auto">
-                {eventDate && `${eventDate}\n\n`}
                 {results
                   .filter((r) => r.memberEarnings > 0)
                   .map(
-                    (r) => `${r.name}\n${r.breakdown} $${r.memberEarnings}\n`
+                    (r) => `${eventDate ? `${eventDate} ` : ""}${r.name}\n${r.breakdown} $${r.memberEarnings}`
                   )
                   .join("\n")}
                 {`\n公司總收入: $${totalCompanyEarnings}`}
