@@ -222,7 +222,7 @@ export default function IdolPaymentCalculator() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3">
-                <div className="grid grid-cols-6 gap-1.5">
+                <div className="grid grid-cols-4 gap-1.5">
                   <div>
                     <Label className="text-[10px] block text-center mb-1">普通</Label>
                     <Input
@@ -279,35 +279,42 @@ export default function IdolPaymentCalculator() {
                       className="text-center text-sm h-9 px-1"
                     />
                   </div>
-                  <div>
-                    <Label className="text-[10px] block text-center mb-1">生誕祭</Label>
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      min="0"
-                      value={inputs[member.name]?.birthday || ""}
-                      onChange={(e) =>
-                        updateInput(member.name, "birthday", e.target.value)
-                      }
-                      placeholder="0"
-                      className="text-center text-sm h-9 px-1"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-[10px] block text-center mb-1">Solo</Label>
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      min="0"
-                      value={inputs[member.name]?.solo || ""}
-                      onChange={(e) =>
-                        updateInput(member.name, "solo", e.target.value)
-                      }
-                      placeholder="0"
-                      className="text-center text-sm h-9 px-1"
-                    />
-                  </div>
                 </div>
+                <details className="mt-2">
+                  <summary className="text-[10px] text-muted-foreground cursor-pointer hover:text-gray-700">
+                    更多選項
+                  </summary>
+                  <div className="grid grid-cols-2 gap-1.5 mt-2">
+                    <div>
+                      <Label className="text-[10px] block text-center mb-1">生誕祭</Label>
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        min="0"
+                        value={inputs[member.name]?.birthday || ""}
+                        onChange={(e) =>
+                          updateInput(member.name, "birthday", e.target.value)
+                        }
+                        placeholder="0"
+                        className="text-center text-sm h-9 px-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[10px] block text-center mb-1">Solo</Label>
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        min="0"
+                        value={inputs[member.name]?.solo || ""}
+                        onChange={(e) =>
+                          updateInput(member.name, "solo", e.target.value)
+                        }
+                        placeholder="0"
+                        className="text-center text-sm h-9 px-1"
+                      />
+                    </div>
+                  </div>
+                </details>
               </CardContent>
             </Card>
           ))}
