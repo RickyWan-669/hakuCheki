@@ -145,7 +145,7 @@ export default function IdolPaymentCalculator() {
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-4 px-3 sm:py-8 sm:px-4">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-bold text-center mb-1 text-gray-800">
-          Hakuchuumi出糧計算器
+          Hakuchuumu出糧計算器
         </h1>
         <p className="text-center text-sm text-muted-foreground mb-4 sm:mb-6">
           計算每位成員應得的收入和公司收益
