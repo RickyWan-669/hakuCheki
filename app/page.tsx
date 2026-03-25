@@ -317,7 +317,7 @@ export default function IdolPaymentCalculator() {
             <div className="flex items-center justify-between gap-4">
               <div className="flex-1">
                 <Label className="text-sm font-medium">全員合照</Label>
-                <p className="text-xs text-muted-foreground">每張令每位成員獲得 $25</p>
+                <p className="text-xs text-muted-foreground"></p>
               </div>
               <div className="w-24">
                 <Input
